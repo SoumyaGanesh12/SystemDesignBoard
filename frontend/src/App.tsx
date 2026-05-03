@@ -1,8 +1,12 @@
 import Canvas from './components/Canvas'
+import ComponentPalette from './components/ComponentPalette';
 
 function App(){
   return(
-    <Canvas/>
+    <div>
+      <ComponentPalette/>
+      <Canvas/>
+    </div>
   )
 }
 
