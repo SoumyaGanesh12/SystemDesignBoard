@@ -1,0 +1,36 @@
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+
+# Backend Java
+backend-java/target/
+backend-java/.mvn/wrapper/maven-wrapper.jar
+backend-java/.classpath
+backend-java/.project
+backend-java/.settings/
+backend-java/.metadata
+backend-java/bin/
+
+# Backend Node (coming in Week 3)
+backend-node/node_modules/
+backend-node/dist/
+backend-node/.env
+backend-node/.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.iml
+*.iws
+*.ipr
+# Eclipse
+.metadata/
+
+# Docker
+*.log
