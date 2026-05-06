@@ -5,6 +5,11 @@ import styles from './ComponentPalette.module.css'
 const categories: ComponentCategory[] = ['Client', 'Compute', 'Storage', 'Messaging', 'Network']
 
 function ComponentPalette(){
+    function onDragStart(event: React.DragEvent, componentId: string){
+        event.dataTransfer.setData('componentId', componentId)
+        event.dataTransfer.effectAllowed = 'move'
+    }
+
     return (
         <div className={styles.palette}>
             <h2 className={styles.title}>Components</h2>
@@ -18,7 +23,12 @@ function ComponentPalette(){
                     {paletteComponents
                         .filter(component => component.category === category)
                         .map(component => (
-                            <div key={component.id} className={styles.componentItem}>
+                            <div 
+                                key={component.id} 
+                                className={styles.componentItem}
+                                draggable
+                                onDragStart={event => onDragStart(event, component.id)}
+                            >
                                 <span className={styles.icon}>{component.icon}</span>
                                 <span className={styles.name}>{component.name}</span>
                             </div>

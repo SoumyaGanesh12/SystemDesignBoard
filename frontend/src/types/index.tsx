@@ -8,3 +8,9 @@ export interface PaletteComponent{
     icon: string
     description: string
 }
+
+export interface CanvasNodeData extends Record<string, unknown> {
+    label: string
+    componentId: string
+    category: string
+}
