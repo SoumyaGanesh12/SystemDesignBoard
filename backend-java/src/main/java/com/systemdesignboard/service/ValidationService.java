@@ -84,7 +84,8 @@ public class ValidationService {
 			
 			if(clientToDb || dbToClient) {
 				results.add(new ValidationResult(
-					edge.getSource(),
+					null,
+					edge.getId(),
 					rule.getSeverity(),
 					rule.getCode(),
 					rule.getDescription()
@@ -112,17 +113,13 @@ public class ValidationService {
 				.anyMatch(n -> "load-balancer".equals(n.getComponentId()));
 		
 		if(serverCount > 1 && !hasLoadBalancer) {
-			// Flag all server nodes
-			for(CanvasNode node: nodes) {
-				if ("server".equals(node.getComponentId())) {
-                    results.add(new ValidationResult(
-                        node.getId(),
-                        rule.getSeverity(),
-                        rule.getCode(),
-                        rule.getDescription()
-                    ));
-                }
-			}
+			 results.add(new ValidationResult(
+                 null,
+                 null,
+                 rule.getSeverity(),
+                 rule.getCode(),
+                 rule.getDescription()
+             ));
 		}
 	}
 	
@@ -141,11 +138,26 @@ public class ValidationService {
 			
 			if(seen.contains(reverse)) {
 				results.add(new ValidationResult(
-                    edge.getSource(),
+                    null,
+                    edge.getId(),
                     rule.getSeverity(),
                     rule.getCode(),
                     rule.getDescription()
 	            ));
+				
+				// Flag reverse edge
+				for(CanvasEdge reverseEdge: edges) {
+					if((reverseEdge.getSource() + "->" + reverseEdge.getTarget()).equals(reverse)) {
+						results.add(new ValidationResult(
+								null,
+								reverseEdge.getId(),
+								rule.getSeverity(),
+								rule.getCode(),
+								rule.getDescription()
+						));
+						break;
+					}
+				}
 			}
 			
 			seen.add(forward);

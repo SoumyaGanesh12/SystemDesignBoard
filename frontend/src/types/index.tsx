@@ -16,7 +16,8 @@ export interface CanvasNodeData extends Record<string, unknown> {
 }
 
 export interface ValidationResult {
-    nodeId: string
+    nodeId: string | null
+    edgeId: string | null
     severity: string
     code: string
     message: string

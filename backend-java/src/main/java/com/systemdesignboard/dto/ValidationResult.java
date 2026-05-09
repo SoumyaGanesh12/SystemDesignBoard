@@ -7,6 +7,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class ValidationResult {
 	private String nodeId;
+	private String edgeId;
 	private String severity;
 	private String code;
 	private String message;

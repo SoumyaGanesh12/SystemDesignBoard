@@ -1,4 +1,4 @@
-import { ReactFlow, Background, Controls, MiniMap, BackgroundVariant, useNodesState, useEdgesState, addEdge, type Connection, type Node } from '@xyflow/react'
+import { ReactFlow, Background, Controls, MiniMap, BackgroundVariant, useNodesState, useEdgesState, addEdge, type Connection, type Node, type Edge } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import { paletteComponents } from '../data/components'
 import styles from './Canvas.module.css'
@@ -12,7 +12,7 @@ let nodeIdCounter = 1
 
 function Canvas(){
     const [nodes, setNodes, onNodesChange] = useNodesState<Node<CanvasNodeData>>([])
-    const [edges, setEdges, onEdgesChange] = useEdgesState([])
+    const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
     const [validationResults, setValidationResults] = useState<ValidationResult[]>([])
     const [reactFlowInstance, setReactFlowInstance] = useState<any>(null)
     const reactFlowWrapper = useRef<HTMLDivElement>(null)
@@ -67,6 +67,40 @@ function Canvas(){
         setNodes(nds => [...nds, newNode])
     }
 
+    function getStyledEdges(baseEdges: Edge[], results: ValidationResult[]): Edge[]{
+        const errorEdgeIds = new Set(
+            results
+                .filter(r => r.edgeId && r.severity === 'ERROR')
+                .map(r => r.edgeId)
+        )
+
+        const warningEdgeIds = new Set(
+            results
+                .filter(r => r.edgeId && r.severity === 'WARNING')
+                .map(r => r.edgeId)
+        )
+
+        return baseEdges.map(edge => {
+            if(errorEdgeIds.has(edge.id)){
+                return{
+                    ...edge,
+                    style: { stroke:'#ff4444', strokeWidth: 2},
+                    animated: true,
+                }
+            }
+
+            if(warningEdgeIds.has(edge.id)){
+                return{
+                    ...edge,
+                    style: {stroke: '#ffaa00', strokeWidth: 2},
+                    animated: true,
+                }
+            }
+
+            return edge
+        })
+    }
+
     async function validateGraph(currentNodes: any[], currentEdges: any[]){
         if(currentNodes.length === 0){
             setValidationResults([])
@@ -88,7 +122,7 @@ function Canvas(){
 
     return(
         <div className={styles.canvasWrapper} ref={reactFlowWrapper}>
-            <ReactFlow colorMode="dark" nodes={nodes} edges={edges} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange}
+            <ReactFlow colorMode="dark" nodes={nodes} edges={getStyledEdges(edges, validationResults)} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange}
                         onConnect={onConnect} onInit={setReactFlowInstance} onDrop={onDrop} onDragOver={onDragOver} fitView>
                 {/* Dotted grid background */}
                 <Background
