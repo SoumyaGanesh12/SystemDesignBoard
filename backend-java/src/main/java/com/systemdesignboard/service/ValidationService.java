@@ -12,12 +12,25 @@ import org.springframework.stereotype.Service;
 import com.systemdesignboard.dto.GraphRequest;
 import com.systemdesignboard.dto.ValidationResponse;
 import com.systemdesignboard.dto.ValidationResult;
+import com.systemdesignboard.dto.ValidationRule;
 import com.systemdesignboard.model.CanvasEdge;
 import com.systemdesignboard.model.CanvasNode;
 
 @Service
 public class ValidationService {
+	
+	private final ValidationRuleRegistry ruleRegistry;
+	
+	public ValidationService(ValidationRuleRegistry ruleRegistry) {
+		this.ruleRegistry = ruleRegistry;
+	}
+	
+	public List<ValidationRule> getRules(){
+		return ruleRegistry.getAllRules();
+	}
+	
 	public ValidationResponse validate(GraphRequest req) {
+		Map<String, ValidationRule> ruleMap = ruleRegistry.getRuleMap();
 		List<ValidationResult> results = new ArrayList<>();
 		List<CanvasNode> nodes = req.getNodes();
 		List<CanvasEdge> edges = req.getEdges();
@@ -33,9 +46,9 @@ public class ValidationService {
 		}
 		
 		// Run each validation rule
-		checkDirectClientDatabaseConnection(edges, nodeComponentMap, results);
-		checkMultipleServersNoLoadBalancer(nodes, edges, nodeComponentMap, results);
-		checkCircularDependency(edges, results);
+		checkDirectClientDatabaseConnection(edges, nodeComponentMap, ruleMap, results);
+		checkMultipleServersNoLoadBalancer(nodes, edges, nodeComponentMap, ruleMap, results);
+		checkCircularDependency(edges, ruleMap, results);
 		
 		return new ValidationResponse(results);
 	}
@@ -44,8 +57,12 @@ public class ValidationService {
 	private void checkDirectClientDatabaseConnection(
 			List<CanvasEdge> edges,
 			Map<String, String> nodeComponentMap, 
+		    Map<String, ValidationRule> ruleMap,
 			List<ValidationResult> results
 	) {
+		
+		ValidationRule rule = ruleMap.get("DIRECT_CLIENT_DB_CONNECTION");
+		
 		for(CanvasEdge edge: edges) {
 			String srcComp = nodeComponentMap.get(edge.getSource());
 			String tarComp = nodeComponentMap.get(edge.getTarget());
@@ -56,10 +73,9 @@ public class ValidationService {
 			if(clientToDb || dbToClient) {
 				results.add(new ValidationResult(
 					edge.getSource(),
-					"ERROR",
-					"DIRECT_CLIENT_DB_CONNECTION",
-					"Your database is directly connected to client. " +
-					"A server or API gateway should sit between them to protect your data."
+					rule.getSeverity(),
+					rule.getCode(),
+					rule.getDescription()
 				));
 			}
 		}
@@ -70,8 +86,12 @@ public class ValidationService {
 			List<CanvasNode> nodes,
 			List<CanvasEdge> edges,
 			Map<String, String> nodeComponentMap, 
+			Map<String, ValidationRule> ruleMap,
 			List<ValidationResult> results
 	) {
+		
+		ValidationRule rule = ruleMap.get("MULTIPLE_SERVERS_NO_LOAD_BALANCER");
+		
 		long serverCount = nodes.stream()
 				.filter(n -> "server".equals(n.getComponentId()))
 				.count();
@@ -85,10 +105,9 @@ public class ValidationService {
 				if ("server".equals(node.getComponentId())) {
                     results.add(new ValidationResult(
                         node.getId(),
-                        "WARNING",
-                        "MULTIPLE_SERVERS_NO_LOAD_BALANCER",
-                        "You have multiple servers but no load balancer. " +
-                        "Without a load balancer traffic cannot be distributed evenly across your servers."
+                        rule.getSeverity(),
+                        rule.getCode(),
+                        rule.getDescription()
                     ));
                 }
 			}
@@ -98,9 +117,12 @@ public class ValidationService {
 	// Rule 3 - Error: two nodes pointing at each other (circular dependency)
 	private void checkCircularDependency(
 			List<CanvasEdge> edges,
+			Map<String, ValidationRule> ruleMap,
 			List<ValidationResult> results
 	) {
+		ValidationRule rule = ruleMap.get("CIRCULAR_DEPENDENCY");
 		Set<String> seen = new HashSet<>();
+		
 		for(CanvasEdge edge: edges) {
 			String forward = edge.getSource() + "->" + edge.getTarget();
 			String reverse = edge.getTarget() + "->" + edge.getSource();
@@ -108,10 +130,9 @@ public class ValidationService {
 			if(seen.contains(reverse)) {
 				results.add(new ValidationResult(
                     edge.getSource(),
-                    "ERROR",
-                    "CIRCULAR_DEPENDENCY",
-                    "These two components point at each other. " +
-                    "This creates a circular dependency which can cause infinite loops and unpredictable behavior."
+                    rule.getSeverity(),
+                    rule.getCode(),
+                    rule.getDescription()
 	            ));
 			}
 			
