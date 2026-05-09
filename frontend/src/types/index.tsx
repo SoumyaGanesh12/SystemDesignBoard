@@ -14,3 +14,10 @@ export interface CanvasNodeData extends Record<string, unknown> {
     componentId: string
     category: string
 }
+
+export interface ValidationResult {
+    nodeId: string
+    severity: string
+    code: string
+    message: string
+}

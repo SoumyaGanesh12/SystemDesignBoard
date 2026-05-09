@@ -5,13 +5,15 @@ import styles from './Canvas.module.css'
 import React, { useCallback, useRef, useState, useEffect } from 'react'
 import type { CanvasNodeData } from '../types'
 import { API_CONFIG } from '../config/api'
+import ValidationPanel from './ValidationPanel'
+import type { ValidationResult } from '../types'
 
 let nodeIdCounter = 1
 
 function Canvas(){
     const [nodes, setNodes, onNodesChange] = useNodesState<Node<CanvasNodeData>>([])
     const [edges, setEdges, onEdgesChange] = useEdgesState([])
-    const [validationResults, setValidationResults] = useState<any[]>([])
+    const [validationResults, setValidationResults] = useState<ValidationResult[]>([])
     const [reactFlowInstance, setReactFlowInstance] = useState<any>(null)
     const reactFlowWrapper = useRef<HTMLDivElement>(null)
     
@@ -102,31 +104,7 @@ function Canvas(){
                 {/* Small overview map of the canvas */}
                 <MiniMap/>
             </ReactFlow>
-            <div style={{
-                position: 'fixed',
-                bottom:'20px',
-                left: '240px',
-                zIndex: 10,
-                background: '#1a1a2e',
-                padding: '12px',
-                borderRadius: '6px',
-                color: '#fff',
-                fontSize: '12px',
-                maxWidth: '300px'
-            }}>
-                {
-                    validationResults.length === 0 ?
-                    'No issues found' :
-                    validationResults.map((r, index) => (
-                        <div key={`${r.nodeId}-${index}`} style={{
-                            color: r.severity === 'ERROR' ? '#ff4444' : '#ffaa00',
-                            marginBottom: '4px'
-                        }}>
-                            {r.severity}: {r.message}
-                        </div>
-                    ))
-                }
-            </div>
+            <ValidationPanel results={validationResults} />
         </div>
     )
 }

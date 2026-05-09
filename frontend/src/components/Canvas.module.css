@@ -1,5 +1,5 @@
 .canvasWrapper {
   width: calc(100vw - 220px);
-  height: 100vh;
+  height: calc(100vh - 140px);
   margin-left: 220px;
 }
