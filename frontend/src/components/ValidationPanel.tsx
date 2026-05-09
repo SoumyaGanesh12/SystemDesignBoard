@@ -6,17 +6,21 @@ interface ValidationPanelProps{
 }
 
 function ValidationPanel({results} : ValidationPanelProps){
+    // Deduplicate by code for display only
+    const uniqueResults = results.filter(
+        (r, index, self) => self.findIndex(item => item.code === r.code) === index
+    )
     return (
         <div className={styles.panel}>
             <h3 className={styles.title}>Validation</h3>
 
-            {results.length === 0 ? (
+            {uniqueResults.length === 0 ? (
                 <div className={styles.success}>
                     <span className={styles.badge}>🟢 ALL CLEAR</span>
                     <p className={styles.message}>Looking good, keep building!</p>
                 </div>
             ) : (
-                results.map((r, index) => (
+                uniqueResults.map((r, index) => (
                     <div
                         key={`${r.nodeId}-${index}`}
                         className={r.severity === 'ERROR' ? styles.error : styles.warning}

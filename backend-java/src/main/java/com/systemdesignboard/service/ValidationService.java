@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -51,18 +50,7 @@ public class ValidationService {
 		checkMultipleServersNoLoadBalancer(nodes, edges, nodeComponentMap, ruleMap, results);
 		checkCircularDependency(edges, ruleMap, results);
 		
-		// Deduplicate - one result per rule code
-		List<ValidationResult> deduplicated = results.stream()
-				.collect(Collectors.toMap(
-					ValidationResult::getCode,
-					r -> r,
-					(existing, replacement) -> existing
-				))
-				.values()
-				.stream()
-				.toList();
-		
-		return new ValidationResponse(deduplicated);
+		return new ValidationResponse(results);
 	}
 	
 	// Rule 1 - Error: client directly connected to database
