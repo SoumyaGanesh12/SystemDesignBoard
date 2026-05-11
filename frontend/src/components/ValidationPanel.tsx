@@ -10,27 +10,33 @@ function ValidationPanel({results} : ValidationPanelProps){
     const uniqueResults = results.filter(
         (r, index, self) => self.findIndex(item => item.code === r.code) === index
     )
+
+    const errors = uniqueResults.filter(r => r.severity === 'ERROR')
+    const warnings = uniqueResults.filter(r => r.severity === 'WARNING')
+
     return (
         <div className={styles.panel}>
             <h3 className={styles.title}>Validation</h3>
 
             {uniqueResults.length === 0 ? (
                 <div className={styles.success}>
-                    <span className={styles.badge}>🟢 ALL CLEAR</span>
-                    <p className={styles.message}>Looking good, keep building!</p>
+                    <span className={styles.badge}>🟢 Looking good, keep building!</span>
                 </div>
             ) : (
-                uniqueResults.map((r, index) => (
-                    <div
-                        key={`${r.nodeId}-${index}`}
-                        className={r.severity === 'ERROR' ? styles.error : styles.warning}
-                    >
-                        <span className={styles.badge}>
-                            {r.severity === 'ERROR' ? '🔴' : '🟡'} {r.severity}
-                        </span>
-                        <p className={styles.message}>{r.message}</p>
-                    </div>
-                ))
+                <div className={styles.list}>
+                    {errors.map((r, index) => (
+                        <div key={`error-${index}`} className={styles.errorRow}>
+                            <span className={styles.errorBadge}>🔴 ERROR</span>
+                            <span className={styles.message}>{r.message}</span>
+                        </div>
+                    ))}
+                    {warnings.map((r, index) => (
+                        <div key={`warning-${index}`} className={styles.warningRow}>
+                            <span className={styles.warningBadge}>🟡 WARNING</span>
+                            <span className={styles.message}>{r.message}</span>
+                        </div>  
+                    ))}
+                </div>
             )}
         </div>
     )
