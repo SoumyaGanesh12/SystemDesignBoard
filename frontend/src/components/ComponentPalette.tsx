@@ -36,7 +36,12 @@ function ComponentPalette(){
                     }
                 </div>
             ))}
+            <div className={styles.helpText}>
+                <p>Click to select</p>
+                <p>Backspace to delete</p>
+            </div>
         </div>
+        
     )
 }
 

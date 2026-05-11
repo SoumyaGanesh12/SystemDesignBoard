@@ -123,7 +123,7 @@ function Canvas(){
     return(
         <div className={styles.canvasWrapper} ref={reactFlowWrapper}>
             <ReactFlow colorMode="dark" nodes={nodes} edges={getStyledEdges(edges, validationResults)} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange}
-                        onConnect={onConnect} onInit={setReactFlowInstance} onDrop={onDrop} onDragOver={onDragOver} fitView>
+                        onConnect={onConnect} onInit={setReactFlowInstance} onDrop={onDrop} onDragOver={onDragOver} deleteKeyCode={['Backspace', 'Delete']} fitView>
                 {/* Dotted grid background */}
                 <Background
                     variant={BackgroundVariant.Dots}

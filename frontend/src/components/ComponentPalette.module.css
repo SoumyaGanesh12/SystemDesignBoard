@@ -55,3 +55,16 @@
   font-size: 13px;
   color: #e0e0e0;
 }
+
+.helpText {
+  position: absolute;
+  bottom: 12px;
+  left: 16px;
+  right: 16px;
+}
+
+.helpText p {
+  font-size: 10px;
+  color: #555;
+  margin-bottom: 2px;
+}
