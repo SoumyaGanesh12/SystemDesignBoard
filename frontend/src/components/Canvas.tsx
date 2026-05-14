@@ -108,7 +108,7 @@ function Canvas(){
         }
 
         try{
-            const response = await fetch(`${API_CONFIG.javaBaseUrl}/api/validate`, {
+            const response = await fetch(`${API_CONFIG.baseUrl}/api/validate`, {
                 method: 'POST',
                 headers: { 'Content-Type': API_CONFIG.contentType},
                 body: JSON.stringify({ nodes: currentNodes, edges: currentEdges})
