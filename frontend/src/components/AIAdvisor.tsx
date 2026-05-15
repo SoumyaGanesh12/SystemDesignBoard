@@ -1,4 +1,4 @@
-import {useState, useRef} from 'react'
+import React, {useState, useRef} from 'react'
 import {API_CONFIG} from '../config/api'
 import type { ValidationResult } from '../types'
 import styles from './AIAdvisor.module.css'
@@ -9,29 +9,38 @@ interface AIAdvisorProps{
     validationResults: ValidationResult[]
 }
 
-function AIAdvisor({ nodes, edges, validationResults} : AIAdvisorProps) {
-    console.log('styles:', styles)
-    const [isOpen, setIsOpen] = useState(false)
-    const [response, setResponse] = useState('')
-    const [isLoading, setIsLoading] = useState(false)
-    const responseRef = useRef<HTMLDivElement>(null)
+interface ChatMessage{
+    role: 'user' | 'assistant'
+    content: string
+}
 
-    async function handleAnalyze(){
-        if(nodes.length === 0) return
-        
-        setIsOpen(true)
-        setResponse('')
+function AIAdvisor({ nodes, edges, validationResults} : AIAdvisorProps) {
+    const [isOpen, setIsOpen] = useState(false)
+    const [messages, setMessages] = useState<ChatMessage[]>([])
+    const [inputValue, setInputValue] = useState('')
+    const [isLoading, setIsLoading] = useState(false)
+    const contentRef = useRef<HTMLDivElement>(null)
+
+    async function streamResponse(chatMessages: ChatMessage[]){
         setIsLoading(true)
 
         try{
             const res = await fetch(`${API_CONFIG.baseUrl}/api/analyze`, {
                 method: 'POST',
                 headers: {'Content-Type': API_CONFIG.contentType},
-                body: JSON.stringify({nodes, edges, validationResults})
+                body: JSON.stringify({
+                    nodes, 
+                    edges, 
+                    validationResults,
+                    messages: chatMessages.length > 0 ? chatMessages : undefined,
+                })
             })
 
             if(!res.ok){
-                setResponse('AI Advisor is currently unavailable. Please try again.')
+                setMessages( prev => [...prev, {
+                    role: 'assistant',
+                    content: 'AI Advisor is currently unavailable. Please try again.',
+                }])
                 setIsLoading(false)
                 return
             }
@@ -41,12 +50,14 @@ function AIAdvisor({ nodes, edges, validationResults} : AIAdvisorProps) {
             const decoder = new TextDecoder()
 
             if(!reader){
-                setResponse('Failed to connect to AI advisor.')
                 setIsLoading(false)
                 return
             }
 
             let fullResponse = ''
+
+            // Add an empty assistant message that updates as chunks arrive
+            setMessages(prev => [...prev, { role: 'assistant', content: ''}])
 
             // Read chunks from the stream one by one
             while(true){
@@ -69,11 +80,16 @@ function AIAdvisor({ nodes, edges, validationResults} : AIAdvisorProps) {
                         const parsed = JSON.parse(data)
                         if(parsed.content){
                             fullResponse += parsed.content
-                            setResponse(fullResponse)
+                            // Update the last message with the growing response
+                            setMessages(prev => {
+                                const updated = [...prev]
+                                updated[updated.length - 1] = { role: 'assistant', content: fullResponse}
+                                return updated
+                            })
 
-                            // Auto scroll to bottom as new text arrives
-                            if(responseRef.current){
-                                responseRef.current.scrollTop = responseRef.current.scrollHeight
+                            // Auto scroll to see new content
+                            if(contentRef.current){
+                                contentRef.current.scrollTop = contentRef.current.scrollHeight
                             }
                         }
                     } catch (e) {
@@ -83,10 +99,37 @@ function AIAdvisor({ nodes, edges, validationResults} : AIAdvisorProps) {
             }
         } catch(error){
             console.error('AI advisor error: ', error)
-            setResponse('Failed to connect to AI advisor.')
+            setMessages(prev => [...prev, {
+                role: 'assistant',
+                content: 'Failed to connect to AI advisor.',
+            }])
         }
 
         setIsLoading(false)
+    }
+
+    async function handleAnalyze(){
+        if(nodes.length === 0) return
+        
+        setIsOpen(true)
+        setMessages([])
+        streamResponse([])
+    }
+
+    function handleSend(){
+        if(inputValue.trim() === '' || isLoading) return
+        const newMessage: ChatMessage = {role: 'user', content: inputValue}
+        const updatedMessages = [...messages, newMessage]
+        setMessages(updatedMessages)
+        setInputValue('')
+        streamResponse(updatedMessages)
+    }
+
+    function handleKeyDown(e: React.KeyboardEvent){
+        if(e.key === 'Enter' && !e.shiftKey){
+            e.preventDefault()
+            handleSend()
+        }
     }
 
     return(
@@ -102,13 +145,39 @@ function AIAdvisor({ nodes, edges, validationResults} : AIAdvisorProps) {
                         <button className={styles.closeButton} onClick={() => setIsOpen(false)}>X</button>
                     </div>
 
-                    <div className={styles.content} ref={responseRef}>
-                        {isLoading && response === '' ? (
+                    <div className={styles.content} ref={contentRef}>
+                        {isLoading && messages.length === 0 ? (
                             <p className={styles.loading}>Analyzing your architecture...</p>
                         ) : (
-                            <div className={styles.response}>{response}</div>
+                            messages.map((msg, index) => (
+                                <div
+                                    key={index}
+                                    className={msg.role === 'user' ? styles.userMessage: styles.assistantMessage}
+                                > {msg.content}
+                                </div>
+                            ))
                         )}
-                    </div>    
+                    </div> 
+
+                    <div className={styles.inputArea}>
+                        <input
+                            type="text"
+                            className={styles.chatInput}
+                            placeholder="Ask a follow up question..."
+                            value={inputValue}
+                            onChange={e => setInputValue(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            disabled={isLoading}
+                        />
+                        <button
+                            className={styles.sendButton}
+                            onClick={handleSend}
+                            disabled={isLoading || inputValue.trim() === ''}
+                        >
+                            Send
+                        </button>
+                    </div>
+
                 </div>
             )}
         </>

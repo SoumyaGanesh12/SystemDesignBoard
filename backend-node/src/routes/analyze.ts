@@ -38,18 +38,34 @@ Risks
 `
 
 router.post('/', async (req: Request, res: Response) => {
-    const {nodes, edges, validationResults} = req.body
+    const {nodes, edges, validationResults, messages} = req.body
     if(!nodes || !edges){
         res.status(400).json({error: 'nodes and edges are required'})
         return
     }
 
-    const userPrompt = `Here is the sytem design: 
+    const designContext = `Current sytem design: 
         Nodes: ${JSON.stringify(nodes, null, 2)}
         Edges: ${JSON.stringify(edges, null, 2)}
         Existing validation results: ${JSON.stringify(validationResults || [], null, 2)}
-        Analyze this architecture.
     `
+
+    // Build the messages array for LLM
+    const llmMessages: { role:string; content: string }[] = [
+        {role: 'system', content: SYSTEM_PROMPT},
+        {role: 'user', content: designContext},
+    ]
+
+    // First request - no conversation history, trigger initial analysis
+    // Follow-up - append full conversation history so LLM has context
+    if(!messages || messages.length === 0 ){
+        llmMessages.push({ role: 'user', content: 'Analyze this structure.'})
+    } else {
+        for(const msg of messages){
+            llmMessages.push({ role: msg.role, content: msg.content})
+        }
+    }
+
     try{
         // Call Groq API with streaming enabled
         const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -60,10 +76,7 @@ router.post('/', async (req: Request, res: Response) => {
             },
             body: JSON.stringify({
                 model: config.groqModel,
-                messages: [
-                    {role: 'system', content: SYSTEM_PROMPT},
-                    {role: 'user', content: userPrompt},
-                ],
+                messages: llmMessages,
                 stream: true,
             }),
         })
