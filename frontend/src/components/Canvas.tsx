@@ -7,6 +7,7 @@ import type { CanvasNodeData } from '../types'
 import { API_CONFIG } from '../config/api'
 import ValidationPanel from './ValidationPanel'
 import type { ValidationResult } from '../types'
+import AIAdvisor from './AIAdvisor'
 
 let nodeIdCounter = 1
 
@@ -138,6 +139,11 @@ function Canvas(){
                 {/* Small overview map of the canvas */}
                 <MiniMap/>
             </ReactFlow>
+            <AIAdvisor
+                nodes={nodes}
+                edges={edges}
+                validationResults={validationResults}
+            />
             <ValidationPanel results={validationResults} />
         </div>
     )

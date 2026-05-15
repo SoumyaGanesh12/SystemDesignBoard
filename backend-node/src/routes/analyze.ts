@@ -19,21 +19,22 @@ Component types and their purposes:
 You will also recieve validation errors and warnings already detected by the rule engine. Do not repeat these.
 Focus on higher level insights.
 
-Respond in this exact structure:
+Guidelines:
+- Be concise. Use short bullet points with dashes, 2-3 per topic.
+- Cover what is good, what the risks are, what to improve, and how it handles load.
+- Use section headings as plain text followed by bullet points.
+- Explain technical terms simply. Your audience has never designed a system before.
+- Be specific to their design, not generic advice.
 
-**What you got right**
-List what is architecturally sound in this design and why.
+Example format:
 
-**Risks**
-What could go wrong under real world condiditions - traffic spikes, server failures, data loss.
+What You Got Right
+- Your server sits between the client and database, protecting data access.
+- The cache reduces repeated database queries for frequently read data.
 
-**What a Senior Engineer would change**
-Specific improvements with reasoning. Not generic advice.
-
-**How this behaves under load**
-Walk through what happens when 10,000 users hit this system simultaneously.
-
-Keep your language simple. No jargon without explanation. You are teaching, not evaluating.
+Risks
+- No redundancy on the server means a single failure takes down the system.
+- Without a load balancer, traffic spikes will overwhelm your single server.
 `
 
 router.post('/', async (req: Request, res: Response) => {
