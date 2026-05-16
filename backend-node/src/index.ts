@@ -5,6 +5,7 @@ import validateRouter from './routes/validate'
 import analyzeRouter from './routes/analyze'
 import designRouter from './routes/design'
 import { connectProducer } from './kafka/producer'
+import { startConsumer } from './kafka/consumer'
 
 const app = express()
 
@@ -22,4 +23,5 @@ app.use('/api/design', designRouter)
 app.listen(config.port, async () => {
     console.log(`Node.js server running on port ${config.port}`)
     await connectProducer()
+    await startConsumer()
 })
