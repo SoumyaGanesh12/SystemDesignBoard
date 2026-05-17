@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import {config} from './config'
+import { initDatabase } from './config/database'
 import validateRouter from './routes/validate'
 import analyzeRouter from './routes/analyze'
 import designRouter from './routes/design'
@@ -22,6 +23,7 @@ app.use('/api/design', designRouter)
 
 app.listen(config.port, async () => {
     console.log(`Node.js server running on port ${config.port}`)
+    await initDatabase()
     await connectProducer()
     await startConsumer()
 })

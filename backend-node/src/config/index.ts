@@ -8,4 +8,5 @@ port: process.env.PORT || '3000',
     groqApiKey: process.env.GROQ_API_KEY || '',
     groqModel: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
     kafkaBroker: process.env.KAFKA_BROKER || 'localhost:9092',
+    databaseUrl: process.env.DATABASE_URL || ''
 }
