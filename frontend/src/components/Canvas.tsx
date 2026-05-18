@@ -8,6 +8,7 @@ import { API_CONFIG } from '../config/api'
 import ValidationPanel from './ValidationPanel'
 import type { ValidationResult } from '../types'
 import AIAdvisor from './AIAdvisor'
+import SaveDesign from './SaveDesign'
 
 let nodeIdCounter = 1
 
@@ -17,6 +18,9 @@ function Canvas(){
     const [validationResults, setValidationResults] = useState<ValidationResult[]>([])
     const [reactFlowInstance, setReactFlowInstance] = useState<any>(null)
     const reactFlowWrapper = useRef<HTMLDivElement>(null)
+    const [designId, setDesignId] = useState<string | null>(null)
+    const [designName, setDesignName] = useState<string>('')
+    const [designVersion, setDesignVersion] = useState<number>(0)
     
     // useEffect(() => {
     //     console.log(JSON.stringify({nodes, edges}, null, 2))    
@@ -121,7 +125,15 @@ function Canvas(){
         }
     }
 
+    function handleDesignSaved(id: string, name: string, version: number){
+        setDesignId(id)
+        setDesignName(name)
+        setDesignVersion(version)
+        console.log(`Design saved: ${name} v${version}`)
+    }
+
     return(
+    <>
         <div className={styles.canvasWrapper} ref={reactFlowWrapper}>
             <ReactFlow colorMode="dark" nodes={nodes} edges={getStyledEdges(edges, validationResults)} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange}
                         onConnect={onConnect} onInit={setReactFlowInstance} onDrop={onDrop} onDragOver={onDragOver} deleteKeyCode={['Backspace', 'Delete']} fitView>
@@ -139,13 +151,21 @@ function Canvas(){
                 {/* Small overview map of the canvas */}
                 <MiniMap/>
             </ReactFlow>
-            <AIAdvisor
-                nodes={nodes}
-                edges={edges}
-                validationResults={validationResults}
-            />
+            
             <ValidationPanel results={validationResults} />
         </div>
+        <SaveDesign
+            nodes={nodes}
+            edges={edges}
+            designId={designId}
+            onSave={handleDesignSaved}
+        />
+        <AIAdvisor
+            nodes={nodes}
+            edges={edges}
+            validationResults={validationResults}
+        />
+    </>
     )
 }
 

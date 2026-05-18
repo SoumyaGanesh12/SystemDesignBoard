@@ -1,0 +1,105 @@
+.saveButton {
+  position: fixed;
+  top: 12px;
+  right: 200px;
+  z-index: 20;
+  padding: 8px 16px;
+  background-color: #252547;
+  color: #e0e0e0;
+  border: 1px solid #333366;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.saveButton:hover {
+  background-color: #2e2e5e;
+}
+
+.saveButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+}
+
+.modal {
+  background-color: #1a1a2e;
+  border: 1px solid #333366;
+  border-radius: 8px;
+  padding: 20px;
+  width: 340px;
+}
+
+.modalTitle {
+  font-size: 14px;
+  color: #e0e0e0;
+  margin-bottom: 12px;
+}
+
+.nameInput {
+  width: 100%;
+  background-color: #252547;
+  color: #e0e0e0;
+  border: 1px solid #333366;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 13px;
+  outline: none;
+  margin-bottom: 12px;
+}
+
+.nameInput:focus {
+  border-color: #5555aa;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.cancelButton {
+  background: none;
+  color: #888;
+  border: 1px solid #333366;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.cancelButton:hover {
+  color: #e0e0e0;
+}
+
+.confirmButton {
+  background-color: #333366;
+  color: #e0e0e0;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.confirmButton:hover {
+  background-color: #444488;
+}
+
+.confirmButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
