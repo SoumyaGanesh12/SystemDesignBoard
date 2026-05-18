@@ -6,12 +6,14 @@ interface SaveDesignInput {
     nodes: any[]
     edges: any[]
     name?: string
+    description?: string
     designId?: string
 }
 
 interface DesignResponse {
     designId: string
     name: string
+    description: string
     version: number
     message: string
 }
@@ -38,8 +40,8 @@ export async function saveDesign(input: SaveDesignInput): Promise<DesignResponse
 
         // Update the design with new graph and incremented version
         await pool.query(
-        'UPDATE designs SET graph = $1, name = $2, version = $3, updated_at = CURRENT_TIMESTAMP WHERE id = $4',
-        [ graph, name || 'Untitled Design', newVersion, existingId ]
+        'UPDATE designs SET graph = $1, name = $2, description = $3, version = $4, updated_at = CURRENT_TIMESTAMP WHERE id = $4',
+        [ graph, name || 'Untitled Design', input.description || '', newVersion, existingId ]
         )
 
         // Publish Kafka event after successful database save
@@ -53,6 +55,7 @@ export async function saveDesign(input: SaveDesignInput): Promise<DesignResponse
         return {
         designId: existingId,
         name: name || 'Untitled Design',
+        description: input.description || '',
         version: newVersion,
         message: 'Design updated successfully',
         }
@@ -62,8 +65,8 @@ export async function saveDesign(input: SaveDesignInput): Promise<DesignResponse
     const designId = uuidv4()
 
     await pool.query(
-        'INSERT INTO designs (id, name, version, graph) VALUES ($1, $2, $3, $4)',
-        [designId, name || 'Untitled Design', 1, graph]
+        'INSERT INTO designs (id, name, description, version, graph) VALUES ($1, $2, $3, $4, $5)',
+        [designId, name || 'Untitled Design', input.description || '', 1, graph]
     )
 
     // Publish Kafka event after successful database save
@@ -77,6 +80,7 @@ export async function saveDesign(input: SaveDesignInput): Promise<DesignResponse
     return {
         designId,
         name: name || 'Untitled Design',
+        description: input.description || '',
         version: 1,
         message: 'Design created successfully',
     }

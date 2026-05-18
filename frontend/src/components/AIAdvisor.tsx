@@ -7,6 +7,8 @@ interface AIAdvisorProps{
     nodes: any[]
     edges: any[]
     validationResults: ValidationResult[]
+    designName: string
+    designDescription: string
 }
 
 interface ChatMessage{
@@ -14,7 +16,7 @@ interface ChatMessage{
     content: string
 }
 
-function AIAdvisor({ nodes, edges, validationResults} : AIAdvisorProps) {
+function AIAdvisor({ nodes, edges, validationResults, designName, designDescription} : AIAdvisorProps) {
     const [isOpen, setIsOpen] = useState(false)
     const [messages, setMessages] = useState<ChatMessage[]>([])
     const [inputValue, setInputValue] = useState('')
@@ -33,6 +35,8 @@ function AIAdvisor({ nodes, edges, validationResults} : AIAdvisorProps) {
                     edges, 
                     validationResults,
                     messages: chatMessages.length > 0 ? chatMessages : undefined,
+                    designName: designName || undefined,
+                    designDescription: designDescription || undefined,
                 })
             })
 

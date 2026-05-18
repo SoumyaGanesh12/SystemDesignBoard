@@ -6,7 +6,7 @@ const router = Router()
 
 // Create a new design
 router.post('/', async (req: Request, res: Response) => {
-    const { nodes, edges, name } = req.body
+    const { nodes, edges, name, description } = req.body
 
     if (!nodes || !edges) {
         res.status(400).json({ error: 'nodes and edges are required' })
@@ -14,7 +14,7 @@ router.post('/', async (req: Request, res: Response) => {
     }
 
     try {
-        const result = await saveDesign({ nodes, edges, name })
+        const result = await saveDesign({ nodes, edges, name, description })
         res.status(201).json(result)
     } catch (error) {
         console.error('Create design error:', error)
@@ -25,7 +25,7 @@ router.post('/', async (req: Request, res: Response) => {
 // Update an existing design
 router.put('/:designId', async (req: Request, res: Response) => {
     const designId = req.params.designId as string
-    const { nodes, edges, name } = req.body
+    const { nodes, edges, name, description } = req.body
 
     if (!nodes || !edges) {
         res.status(400).json({ error: 'nodes and edges are required' })
@@ -33,7 +33,7 @@ router.put('/:designId', async (req: Request, res: Response) => {
     }
 
     try {
-        const result = await saveDesign({ nodes, edges, name, designId })
+        const result = await saveDesign({ nodes, edges, name, description, designId })
         res.json(result)
     } catch (error: any) {
         if (error.message === 'DESIGN_NOT_FOUND') {

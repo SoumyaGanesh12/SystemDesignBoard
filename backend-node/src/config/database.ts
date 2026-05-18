@@ -11,6 +11,7 @@ export async function initDatabase() {
             CREATE TABLE IF NOT EXISTS designs(
                 id UUID PRIMARY KEY,
                 name VARCHAR(255) NOT NULL DEFAULT 'Untitled Design',
+                description TEXT DEFAULT '',
                 version INT NOT NULL DEFAULT 1,
                 graph JSONB NOT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

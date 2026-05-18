@@ -103,3 +103,21 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.descriptionInput {
+  width: 100%;
+  background-color: #252547;
+  color: #e0e0e0;
+  border: 1px solid #333366;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 13px;
+  outline: none;
+  margin-bottom: 12px;
+  resize: none;
+  font-family: inherit;
+}
+
+.descriptionInput:focus {
+  border-color: #5555aa;
+}

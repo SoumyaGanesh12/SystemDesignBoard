@@ -38,17 +38,28 @@ Risks
 `
 
 router.post('/', async (req: Request, res: Response) => {
-    const {nodes, edges, validationResults, messages} = req.body
+    const {nodes, edges, validationResults, messages, designName, designDescription} = req.body
+    console.log('AI context:', { designName, designDescription })
     if(!nodes || !edges){
         res.status(400).json({error: 'nodes and edges are required'})
         return
     }
 
-    const designContext = `Current sytem design: 
-        Nodes: ${JSON.stringify(nodes, null, 2)}
-        Edges: ${JSON.stringify(edges, null, 2)}
-        Existing validation results: ${JSON.stringify(validationResults || [], null, 2)}
-    `
+    let designContext = 'Current system design'
+
+    if (designName) {
+        designContext += `\nApplication: ${designName}`
+    }
+
+    if (designDescription) {
+        designContext += `\nDescription: ${designDescription}`
+    }
+
+    designContext += `\n\nThe user is trying to build this specific system. Tailor your feedback to this use case.\n`
+
+    designContext += `\nNodes: ${JSON.stringify(nodes, null, 2)}`
+    designContext += `\nEdges: ${JSON.stringify(edges, null, 2)}`
+    designContext += `\nExisting validation results: ${JSON.stringify(validationResults || [], null, 2)}`
 
     // Build the messages array for LLM
     const llmMessages: { role:string; content: string }[] = [
@@ -102,6 +113,8 @@ router.post('/', async (req: Request, res: Response) => {
             return
         }
 
+        let buffer = ''
+
         // Read chunks from Groq in a loop until the stream ends
         while(true){
             // reader.read() waits for the next chunk from Groq
@@ -115,14 +128,20 @@ router.post('/', async (req: Request, res: Response) => {
                 break
             }
 
-            // Decode raw bytes into a string
-            const chunk = decoder.decode(value, {stream:true})
-            const lines = chunk.split('\n').filter(line => line.startsWith('data: '))
+            // Append new data to buffer to handle partial chunks
+            buffer += decoder.decode(value, { stream: true })
 
-            for(const line of lines){
+            // Process complete lines from the buffer
+            const parts = buffer.split('\n')
+            // Keep the last part as it might be incomplete
+            buffer = parts.pop() || ''
+
+            for(const part of parts){
                 // Remove the "data: " prefix as the final message
-                const data = line.replace('data: ', '')
+                const line = part.trim()
+                if (!line.startsWith('data: ')) continue
 
+                const data = line.replace('data: ', '')
                 if(data === '[DONE]'){
                     res.write('data: [DONE]\n\n')
                     res.end()
@@ -136,7 +155,7 @@ router.post('/', async (req: Request, res: Response) => {
                         res.write(`data: ${JSON.stringify({content})} \n\n`)
                     }
                 }catch(e){
-                    console.warn('Skipped malformed chunk:', data)
+                    console.warn('Skipped malformed chunk:', data.substring(0, 50))
                 }
             }
         }
