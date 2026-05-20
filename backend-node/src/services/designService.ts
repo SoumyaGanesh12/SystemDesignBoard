@@ -40,7 +40,7 @@ export async function saveDesign(input: SaveDesignInput): Promise<DesignResponse
 
         // Update the design with new graph and incremented version
         await pool.query(
-        'UPDATE designs SET graph = $1, name = $2, description = $3, version = $4, updated_at = CURRENT_TIMESTAMP WHERE id = $4',
+        'UPDATE designs SET graph = $1, name = $2, description = $3, version = $4, updated_at = CURRENT_TIMESTAMP WHERE id = $5',
         [ graph, name || 'Untitled Design', input.description || '', newVersion, existingId ]
         )
 

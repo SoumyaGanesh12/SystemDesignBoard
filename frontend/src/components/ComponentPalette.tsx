@@ -37,8 +37,9 @@ function ComponentPalette(){
                 </div>
             ))}
             <div className={styles.helpText}>
-                <p>Click to select</p>
-                <p>Backspace to delete</p>
+                <p>Drag components onto canvas</p>
+                <p>Connect by dragging between handles</p>
+                <p>Click to select, Backspace to delete</p>
             </div>
         </div>
         

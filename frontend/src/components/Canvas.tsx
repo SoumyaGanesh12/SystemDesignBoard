@@ -179,7 +179,7 @@ function Canvas(){
     <>
         <ComponentPalette/>
         <div className={styles.canvasWrapper} ref={reactFlowWrapper}>
-            <ReactFlow colorMode="dark" nodes={nodes} edges={getStyledEdges(edges, validationResults)} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange}
+            <ReactFlow colorMode="light" nodes={nodes} edges={getStyledEdges(edges, validationResults)} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange}
                         onConnect={onConnect} onInit={setReactFlowInstance} onDrop={onDrop} onDragOver={onDragOver} deleteKeyCode={['Backspace', 'Delete']} fitView>
                 {/* Dotted grid background */}
                 <Background
@@ -205,6 +205,8 @@ function Canvas(){
             nodes={nodes}
             edges={edges}
             designId={designId}
+            designName={designName}
+            designDescription={designDescription}
             onSave={handleDesignSaved}
         />
         <AIAdvisor
