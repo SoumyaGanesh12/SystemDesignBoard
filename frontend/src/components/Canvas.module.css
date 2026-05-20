@@ -2,23 +2,28 @@
   width: calc(100vw - 220px);
   height: calc(100vh - 160px);
   margin-left: 220px;
+  background-color: #faf7f4;
 }
 
 .backButton {
   position: fixed;
-  top: 12px;
+  top: 14px;
   left: 240px;
   z-index: 20;
-  padding: 8px 16px;
-  background-color: #252547;
-  color: #e0e0e0;
-  border: 1px solid #333366;
+  padding: 6px 14px;
+  background-color: #ece5dd;
+  color: #6a5a4a;
+  border: 1px solid #ddd4ca;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.12s ease;
 }
 
 .backButton:hover {
-  background-color: #2e2e5e;
+  background-color: #e4dcd2;
+  color: #3a2e24;
+  border-color: #c8b8a8;
 }

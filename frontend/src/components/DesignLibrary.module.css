@@ -1,50 +1,61 @@
 .container {
   min-height: 100vh;
-  background-color: #0f1117;
-  padding: 40px;
+  background-color: #f5f0eb;
+  padding: 48px 60px;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 32px;
+  margin-bottom: 36px;
 }
 
 .title {
-  font-size: 22px;
-  color: #e0e0e0;
-  font-weight: 600;
+  font-size: 24px;
+  color: #2c2424;
+  font-weight: 700;
+  letter-spacing: -0.3px;
 }
 
 .newButton {
-  background-color: #333366;
-  color: #e0e0e0;
+  background-color: #7a2e2e;
+  color: #f5f0eb;
   border: none;
-  border-radius: 6px;
-  padding: 10px 20px;
+  border-radius: 8px;
+  padding: 10px 22px;
   font-size: 14px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
   cursor: pointer;
+  transition: all 0.15s ease;
 }
 
 .newButton:hover {
-  background-color: #444488;
+  background-color: #8c3636;
 }
 
 .loading {
-  color: #888;
-  font-size: 14px;
-}
-
-.empty {
-  color: #888;
+  color: #8a7a6a;
   font-size: 14px;
   text-align: center;
   margin-top: 80px;
 }
 
-.empty p {
-  margin-bottom: 8px;
+.empty {
+  text-align: center;
+  margin-top: 120px;
+}
+
+.empty p:first-child {
+  font-size: 15px;
+  color: #6a5a4a;
+  margin-bottom: 6px;
+}
+
+.empty p:last-child {
+  font-size: 13px;
+  color: #9a8a7a;
 }
 
 .grid {
@@ -54,52 +65,71 @@
 }
 
 .card {
-  background-color: #1a1a2e;
-  border: 1px solid #333366;
-  border-radius: 8px;
+  background-color: #faf7f4;
+  border: 1px solid #e8e0d6;
+  border-radius: 10px;
   position: relative;
   cursor: pointer;
+  transition: all 0.15s ease;
 }
 
 .card:hover {
-  border-color: #5555aa;
+  border-color: #d0c4b8;
+  box-shadow: 0 4px 16px rgba(80, 50, 30, 0.06);
 }
 
 .cardBody {
-  padding: 16px;
+  padding: 18px;
 }
 
 .cardTitle {
   font-size: 15px;
-  color: #e0e0e0;
-  margin-bottom: 6px;
+  color: #2c2424;
+  font-weight: 600;
+  margin-bottom: 4px;
 }
 
 .cardDescription {
   font-size: 12px;
-  color: #888;
-  margin-bottom: 12px;
-  line-height: 1.4;
+  color: #8a7a6a;
+  margin-bottom: 14px;
+  line-height: 1.5;
 }
 
 .cardMeta {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  padding-top: 10px;
+  border-top: 1px solid #ede6de;
   font-size: 11px;
-  color: #666;
+  color: #9a8a7a;
 }
 
 .deleteButton {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 10px;
+  right: 10px;
   background: none;
   border: none;
-  color: #555;
-  font-size: 14px;
+  color: #c0b0a0;
+  font-size: 13px;
   cursor: pointer;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.12s ease;
+  opacity: 0;
+}
+
+.card:hover .deleteButton {
+  opacity: 1;
 }
 
 .deleteButton:hover {
-  color: #ff4444;
+  background-color: #f0ddd0;
+  color: #7a2e2e;
 }

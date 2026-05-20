@@ -1,24 +1,28 @@
 .saveButton {
   position: fixed;
-  top: 12px;
-  right: 200px;
+  top: 14px;
+  right: 190px;
   z-index: 20;
-  padding: 8px 16px;
-  background-color: #252547;
-  color: #e0e0e0;
-  border: 1px solid #333366;
+  padding: 6px 14px;
+  background-color: #ece5dd;
+  color: #6a5a4a;
+  border: 1px solid #ddd4ca;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.12s ease;
 }
 
 .saveButton:hover {
-  background-color: #2e2e5e;
+  background-color: #e4dcd2;
+  color: #3a2e24;
+  border-color: #c8b8a8;
 }
 
 .saveButton:disabled {
-  opacity: 0.5;
+  opacity: 0.3;
   cursor: not-allowed;
 }
 
@@ -28,7 +32,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(40, 30, 20, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -36,33 +40,64 @@
 }
 
 .modal {
-  background-color: #1a1a2e;
-  border: 1px solid #333366;
-  border-radius: 8px;
-  padding: 20px;
-  width: 340px;
+  background-color: #faf7f4;
+  border: 1px solid #e0d8ce;
+  border-radius: 12px;
+  padding: 24px;
+  width: 380px;
+  box-shadow: 0 20px 60px rgba(40, 30, 20, 0.2);
 }
 
 .modalTitle {
-  font-size: 14px;
-  color: #e0e0e0;
-  margin-bottom: 12px;
+  font-size: 16px;
+  color: #2c2424;
+  font-weight: 600;
+  margin-bottom: 18px;
 }
 
 .nameInput {
   width: 100%;
-  background-color: #252547;
-  color: #e0e0e0;
-  border: 1px solid #333366;
-  border-radius: 6px;
-  padding: 8px 12px;
-  font-size: 13px;
+  background-color: #f5f0eb;
+  color: #2c2424;
+  border: 1px solid #ddd4ca;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
   outline: none;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
+  transition: border-color 0.12s ease;
 }
 
 .nameInput:focus {
-  border-color: #5555aa;
+  border-color: #7a2e2e;
+}
+
+.nameInput::placeholder {
+  color: #b0a090;
+}
+
+.descriptionInput {
+  width: 100%;
+  background-color: #f5f0eb;
+  color: #2c2424;
+  border: 1px solid #ddd4ca;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+  margin-bottom: 18px;
+  resize: none;
+  transition: border-color 0.12s ease;
+}
+
+.descriptionInput:focus {
+  border-color: #7a2e2e;
+}
+
+.descriptionInput::placeholder {
+  color: #b0a090;
 }
 
 .modalActions {
@@ -73,51 +108,49 @@
 
 .cancelButton {
   background: none;
-  color: #888;
-  border: 1px solid #333366;
-  border-radius: 6px;
-  padding: 6px 14px;
-  font-size: 12px;
+  color: #8a7a6a;
+  border: 1px solid #ddd4ca;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
   cursor: pointer;
+  transition: all 0.12s ease;
 }
 
 .cancelButton:hover {
-  color: #e0e0e0;
+  background-color: #ece5dd;
+  color: #5a4e44;
 }
 
 .confirmButton {
-  background-color: #333366;
-  color: #e0e0e0;
+  background-color: #7a2e2e;
+  color: #faf7f4;
   border: none;
-  border-radius: 6px;
-  padding: 6px 14px;
-  font-size: 12px;
+  border-radius: 8px;
+  padding: 8px 22px;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
   cursor: pointer;
+  transition: all 0.12s ease;
 }
 
 .confirmButton:hover {
-  background-color: #444488;
+  background-color: #8c3636;
 }
 
 .confirmButton:disabled {
-  opacity: 0.5;
+  opacity: 0.3;
   cursor: not-allowed;
 }
 
-.descriptionInput {
-  width: 100%;
-  background-color: #252547;
-  color: #e0e0e0;
-  border: 1px solid #333366;
-  border-radius: 6px;
-  padding: 8px 12px;
-  font-size: 13px;
-  outline: none;
-  margin-bottom: 12px;
-  resize: none;
-  font-family: inherit;
-}
-
-.descriptionInput:focus {
-  border-color: #5555aa;
+.saveStatus {
+  position: fixed;
+  top: 50px;
+  right: 210px;
+  z-index: 20;
+  font-size: 12px;
+  color: #4a8a5a;
+  font-weight: 500;
 }
