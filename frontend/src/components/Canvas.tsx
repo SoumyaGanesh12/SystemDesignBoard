@@ -9,6 +9,8 @@ import ValidationPanel from './ValidationPanel'
 import type { ValidationResult } from '../types'
 import AIAdvisor from './AIAdvisor'
 import SaveDesign from './SaveDesign'
+import ComponentPalette from './ComponentPalette'
+import {useNavigate, useParams} from 'react-router-dom'
 
 let nodeIdCounter = 1
 
@@ -26,6 +28,45 @@ function Canvas(){
     // useEffect(() => {
     //     console.log(JSON.stringify({nodes, edges}, null, 2))    
     // }, [nodes, edges])
+
+    // Get designId from URL if opening an existing design
+    const {designId: urlDesignId} = useParams()
+    const navigate = useNavigate()
+
+    // Load existing design when page opens with a designId in URL
+    useEffect(() => {
+        if(!urlDesignId || urlDesignId === 'new') return
+
+        async function loadDesign() {
+            try{
+                const response = await fetch(`${API_CONFIG.baseUrl}/api/design/${urlDesignId}`)
+                if(!response.ok){
+                    console.error('Failed to load design')
+                    return
+                }
+
+                const data = await response.json()
+                const graph = typeof data.graph === 'string' ? JSON.parse(data.graph) : data.graph
+
+                // Populate canvas with saved nodes and edges
+                setNodes(graph.nodes || [])
+                setEdges(graph.edges || [])
+                setDesignId(data.id)
+                setDesignName(data.name)
+                setDesignDescription(data.description || '')
+                setDesignVersion(data.version)
+
+                const maxId = graph.nodes.reduce((max: number, node: any) => {
+                    const num = parseInt(node.id.split('-').pop() || '0')
+                    return num>max ? num : max
+                }, 0)
+                nodeIdCounter = maxId + 1
+            } catch(error){
+                console.error('Failed to load design: ', error)
+            }
+        }
+        loadDesign()
+    }, [urlDesignId])
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -136,6 +177,7 @@ function Canvas(){
 
     return(
     <>
+        <ComponentPalette/>
         <div className={styles.canvasWrapper} ref={reactFlowWrapper}>
             <ReactFlow colorMode="dark" nodes={nodes} edges={getStyledEdges(edges, validationResults)} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange}
                         onConnect={onConnect} onInit={setReactFlowInstance} onDrop={onDrop} onDragOver={onDragOver} deleteKeyCode={['Backspace', 'Delete']} fitView>
@@ -156,6 +198,9 @@ function Canvas(){
             
             <ValidationPanel results={validationResults} />
         </div>
+        <button className={styles.backButton} onClick={() => navigate('/')}>
+            ← Designs
+        </button>
         <SaveDesign
             nodes={nodes}
             edges={edges}

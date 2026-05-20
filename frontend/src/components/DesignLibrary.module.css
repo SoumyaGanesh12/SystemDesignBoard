@@ -1,0 +1,105 @@
+.container {
+  min-height: 100vh;
+  background-color: #0f1117;
+  padding: 40px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.title {
+  font-size: 22px;
+  color: #e0e0e0;
+  font-weight: 600;
+}
+
+.newButton {
+  background-color: #333366;
+  color: #e0e0e0;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.newButton:hover {
+  background-color: #444488;
+}
+
+.loading {
+  color: #888;
+  font-size: 14px;
+}
+
+.empty {
+  color: #888;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 80px;
+}
+
+.empty p {
+  margin-bottom: 8px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  background-color: #1a1a2e;
+  border: 1px solid #333366;
+  border-radius: 8px;
+  position: relative;
+  cursor: pointer;
+}
+
+.card:hover {
+  border-color: #5555aa;
+}
+
+.cardBody {
+  padding: 16px;
+}
+
+.cardTitle {
+  font-size: 15px;
+  color: #e0e0e0;
+  margin-bottom: 6px;
+}
+
+.cardDescription {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.cardMeta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #666;
+}
+
+.deleteButton {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  color: #555;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.deleteButton:hover {
+  color: #ff4444;
+}
