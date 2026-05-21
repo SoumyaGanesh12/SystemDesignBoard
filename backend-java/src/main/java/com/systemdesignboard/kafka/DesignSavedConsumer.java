@@ -11,11 +11,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.systemdesignboard.service.ValidationService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Component
 public class DesignSavedConsumer {
 	private final ValidationService validationServ;
 	private final KafkaTemplate<String, String> kafkaTemplate;
 	private final ObjectMapper objectMapper;
+	
+	private static final Logger logger = LoggerFactory.getLogger(DesignSavedConsumer.class);
 	
 	public DesignSavedConsumer(
 			ValidationService validationService,
@@ -29,7 +34,7 @@ public class DesignSavedConsumer {
 	@KafkaListener(topics = "design.saved", groupId = "systemdesignboard-validation")
 	public void consume(String message) {
 		try {
-			System.out.println("Received design.saved event");
+			logger.info("Received design.saved event");
 			
 			JsonNode root = objectMapper.readTree(message);
 			String designId = root.get("designId").asText();
@@ -59,10 +64,10 @@ public class DesignSavedConsumer {
 			String resultJson = objectMapper.writeValueAsString(resultMsg);
 			kafkaTemplate.send("validation.results", designId, resultJson);
 			
-			System.out.println("Published design summary for: " + designId);
+			logger.info("Published design summary for: " + designId);
 			
 		} catch(Exception ex) {
-			System.err.println("Error processing design.saved event: " + ex.getMessage());
+			logger.error("Error processing design.saved event: " + ex.getMessage());
 			ex.printStackTrace();
 		}
 	}

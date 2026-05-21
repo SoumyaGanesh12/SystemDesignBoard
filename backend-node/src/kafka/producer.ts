@@ -1,5 +1,6 @@
 import { Kafka } from 'kafkajs'
 import { config } from '../config'
+import logger from '../config/logger'
 
 // Creates a Kafka client instance
 // clientId identifies this application to the Kafka broker
@@ -14,18 +15,18 @@ let isConnected = false
 
 export async function connectProducer(retries = 5): Promise<void>{
     for(let i=0; i<retries; i++){
-        console.log('Connecting to Kafka at:', config.kafkaBroker)
+        logger.info(`Connecting to Kafka at: ${config.kafkaBroker}`)
         try{
             await producer.connect()
             isConnected = true
-            console.log('Kafka producer connected')
+            logger.info('Kafka producer connected')
             return
         }catch (error){
-            console.log(`Kafka producer not ready, retrying in 3 seconds... (${i + 1}/${retries})`)
+            logger.warn(`Kafka producer not ready, retrying in 3 seconds... (${i + 1}/${retries})`)
             await new Promise(resolve => setTimeout(resolve, 3000))
         }
     }
-    console.error('Failed to connect to Kafka producer after retries')
+    logger.error('Failed to connect to Kafka producer after retries')
 }
 
 export async function publishDesignSaved(designData: {
@@ -35,7 +36,7 @@ export async function publishDesignSaved(designData: {
     savedAt: string
 }){
     if(!isConnected){
-        console.warn('Kafka producer not connected, skipping publish')
+        logger.warn('Kafka producer not connected, skipping publish')
         return
     }
 
@@ -50,9 +51,9 @@ export async function publishDesignSaved(designData: {
                 },
             ],
         })
-        console.log(`Published design.saved event for: ${designData.designId}`)
+        logger.info(`Published design.saved event for: ${designData.designId}`)
     } catch (error) {
-        console.error('Failed to publish design.saved', error)
+        logger.error(`Failed to publish design.saved: ${error}`)
     }
 }
 

@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express'
 import { saveDesign, listDesigns, getDesign, deleteDesign } from '../services/designService'
 import { addSSEConnection, removeSSEConnection } from '../kafka/consumer'
+import logger from '../config/logger'
 
 const router = Router()
 
@@ -17,7 +18,7 @@ router.post('/', async (req: Request, res: Response) => {
         const result = await saveDesign({ nodes, edges, name, description })
         res.status(201).json(result)
     } catch (error) {
-        console.error('Create design error:', error)
+        logger.error(`Create design error: ${error}`)
         res.status(500).json({ error: 'Failed to create design' })
     }
 })
@@ -37,10 +38,10 @@ router.put('/:designId', async (req: Request, res: Response) => {
         res.json(result)
     } catch (error: any) {
         if (error.message === 'DESIGN_NOT_FOUND') {
-        res.status(404).json({ error: 'Design not found' })
-        return
+            res.status(404).json({ error: 'Design not found' })
+            return
         }
-        console.error('Update design error:', error)
+        logger.error(`Update design error: ${error}`)
         res.status(500).json({ error: 'Failed to update design' })
     }
 })
@@ -51,7 +52,7 @@ router.get('/list', async (req: Request, res: Response) => {
         const designs = await listDesigns()
         res.json(designs)
     } catch (error) {
-        console.error('List designs error:', error)
+        logger.error(`List designs error: ${error}`)
         res.status(500).json({ error: 'Failed to fetch designs' })
     }
 })
@@ -67,12 +68,12 @@ router.get('/events/:designId', (req: Request, res: Response) => {
 
     // Register browser connection
     addSSEConnection(designId, res)
-    console.log(`SSE connection opened for design: ${designId}`)
+    logger.info(`SSE connection opened for design: ${designId}`)
 
     // Clean up when browser disconnects
     req.on('close', () => {
         removeSSEConnection(designId, res)
-        console.log(`SSE connection closed for design: ${designId}`)
+        logger.info(`SSE connection closed for design: ${designId}`)
     })
 })
 
@@ -85,10 +86,10 @@ router.get('/:designId', async (req: Request, res: Response) => {
         res.json(design)
     } catch (error: any) {
         if (error.message === 'DESIGN_NOT_FOUND') {
-        res.status(404).json({ error: 'Design not found' })
-        return
+            res.status(404).json({ error: 'Design not found' })
+            return
         }
-        console.error('Get design error:', error)
+        logger.error(`Get design error: ${error}`)
         res.status(500).json({ error: 'Failed to fetch design' })
     }
 })
@@ -105,7 +106,7 @@ router.delete('/:designId', async( req: Request, res: Response) => {
             res.status(404).json({ error: 'Design not found' })
             return
         }
-        console.error('Delete design error: ', error)
+        logger.error(`Delete design error: ${error}`)
         res.status(500).json({error: 'Failed to delete design'})
     }
 })

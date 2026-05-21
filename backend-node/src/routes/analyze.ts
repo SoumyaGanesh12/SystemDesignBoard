@@ -1,5 +1,6 @@
 import {Router, Request, Response} from 'express'
 import {config} from '../config'
+import logger from '../config/logger'
 
 const router = Router()
 
@@ -39,7 +40,7 @@ Risks
 
 router.post('/', async (req: Request, res: Response) => {
     const {nodes, edges, validationResults, messages, designName, designDescription} = req.body
-    console.log('AI context:', { designName, designDescription })
+    logger.info(`AI context: ${JSON.stringify({ designName, designDescription })}`)
     if(!nodes || !edges){
         res.status(400).json({error: 'nodes and edges are required'})
         return
@@ -94,7 +95,7 @@ router.post('/', async (req: Request, res: Response) => {
 
         if(!response.ok){
             const error = await response.text()
-            console.error('Groq API error:', error)
+            logger.error(`Groq API error: ${error}`)
             res.status(502).json({ error: 'AI service unavailable' })
             return
         }
@@ -155,12 +156,12 @@ router.post('/', async (req: Request, res: Response) => {
                         res.write(`data: ${JSON.stringify({content})} \n\n`)
                     }
                 }catch(e){
-                    console.warn('Skipped malformed chunk:', data.substring(0, 50))
+                    logger.warn(`Skipped malformed chunk: ${data.substring(0, 50)}`)
                 }
             }
         }
     } catch(error){
-        console.error('AI advisor error:', error)
+        logger.error(`AI advisor error: ${error}`)
         res.status(503).json({error: 'AI service unavailable'})
     }
 })

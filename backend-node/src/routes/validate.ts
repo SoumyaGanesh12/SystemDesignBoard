@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express'
 import { config } from '../config'
+import logger from '../config/logger'
 
 const router = Router()
 
@@ -14,7 +15,7 @@ router.post('/', async(req: Request, res: Response) => {
         const data = await response.json()
         res.status(response.status).json(data)
     }catch(error){
-        console.error('Validation service error:', error)
+        logger.error(`Validation service error: ${error}`)
         res.status(503).json({ error: 'Validation service unavailable' })
     }
 })
@@ -25,7 +26,7 @@ router.get('/rules', async(req: Request, res: Response) => {
         const data = await response.json()
         res.status(response.status).json(data)
     }catch(error){
-        console.error('Validation service error:', error)
+        logger.error(`Validation service error: ${error}`)
         res.status(503).json({ error: 'Validation service unavailable' })
     }
 })
