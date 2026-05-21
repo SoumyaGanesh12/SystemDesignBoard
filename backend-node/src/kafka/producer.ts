@@ -12,15 +12,20 @@ const producer = kafka.producer()
 
 let isConnected = false
 
-export async function connectProducer(){
-    console.log('Connecting to Kafka at:', config.kafkaBroker)
-    try{
-        await producer.connect()
-        isConnected = true
-        console.log('Kafka producer connected')
-    }catch (error){
-        console.error('Kafka producer connection error: ', error)
+export async function connectProducer(retries = 5): Promise<void>{
+    for(let i=0; i<retries; i++){
+        console.log('Connecting to Kafka at:', config.kafkaBroker)
+        try{
+            await producer.connect()
+            isConnected = true
+            console.log('Kafka producer connected')
+            return
+        }catch (error){
+            console.log(`Kafka producer not ready, retrying in 3 seconds... (${i + 1}/${retries})`)
+            await new Promise(resolve => setTimeout(resolve, 3000))
+        }
     }
+    console.error('Failed to connect to Kafka producer after retries')
 }
 
 export async function publishDesignSaved(designData: {

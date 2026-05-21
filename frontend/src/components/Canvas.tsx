@@ -23,7 +23,6 @@ function Canvas(){
     const [designId, setDesignId] = useState<string | null>(null)
     const [designName, setDesignName] = useState<string>('')
     const [designDescription, setDesignDescription] = useState<string>('')
-    const [designVersion, setDesignVersion] = useState<number>(0)
     
     // useEffect(() => {
     //     console.log(JSON.stringify({nodes, edges}, null, 2))    
@@ -54,7 +53,6 @@ function Canvas(){
                 setDesignId(data.id)
                 setDesignName(data.name)
                 setDesignDescription(data.description || '')
-                setDesignVersion(data.version)
 
                 const maxId = graph.nodes.reduce((max: number, node: any) => {
                     const num = parseInt(node.id.split('-').pop() || '0')
@@ -170,7 +168,6 @@ function Canvas(){
     function handleDesignSaved(id: string, name: string, version: number, description: string){
         setDesignId(id)
         setDesignName(name)
-        setDesignVersion(version)
         setDesignDescription(description)
         console.log(`Design saved: ${name} v${version}`)
     }

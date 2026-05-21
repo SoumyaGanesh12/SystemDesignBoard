@@ -21,6 +21,11 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_LISTENERS: INTERNAL://0.0.0.0:29092,EXTERNAL://0.0.0.0:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   kafka-init:
     image: confluentinc/cp-kafka:7.5.0
@@ -46,7 +51,48 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-    command: ["postgres", "-c", "password_encryption=md5"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sduser -d systemdesignboard"]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+
+  backend-java:
+    build: ./backend-java
+    ports:
+      - "8080:8080"
+    depends_on:
+      - kafka
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      FRONTEND_URL: http://localhost
+
+  backend-node:
+    build: ./backend-node
+    ports:
+      - "3000:3000"
+    depends_on:
+      kafka:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      backend-java:
+        condition: service_started
+    environment:
+      PORT: 3000
+      JAVA_API_URL: http://backend-java:8080
+      FRONTEND_URL: http://localhost
+      KAFKA_BROKER: kafka:29092
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      GROQ_MODEL: llama-3.3-70b-versatile
+  
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend-node
 
 volumes:
   pgdata:
