@@ -19,11 +19,17 @@ Built for engineers who can write code but have never drawn a system diagram bef
                        │   Kafka Producer  │ ──────>│  Kafka Broker    │
                        │   Kafka Consumer  │<───────│    (Docker)      │
                        └───────────────────┘        └──────────────────┘
+                                │
+                       ┌────────▼─────────┐
+                       │   PostgreSQL     │
+                       │   (Design Store) │
+                       └──────────────────┘
 ```
 
 **Node.js** - I/O orchestration: API routing, LLM streaming, Kafka messaging, SSE connections.
 **Java** - CPU-bound computation: graph traversal, rule-based validation.
 **Kafka** - Decouples save flow from processing. Supports future consumers without modifying the producer.
+**PostgreSQL** - Persists designs with versioning. Stores graph data as JSONB.
 
 ## User Flow
 
@@ -31,31 +37,35 @@ Built for engineers who can write code but have never drawn a system diagram bef
 ┌───────────┐     ┌───────────┐     ┌────────────┐     ┌───────────┐     ┌───────────┐
 │  1. DRAG  │────>│2. CONNECT │────>│3. VALIDATE │────>│4. ANALYZE │────>│  5. SAVE  │
 │           │     │           │     │            │     │           │     │           │
-│ Drop      │     │ Draw      │     │-> Errors   │     │ AI streams│     │ Kafka     │
-│ components│     │ edges for │     │ on edges   │     │ feedback  │     │ async     │
-│ from      │     │ data flow │     │-> Warnings │     │ + chat    │     │ processing│
-│ palette   │     │           │     │ and panel  │     │ follow-up │     │ via SSE   │
+│ Drop      │     │ Draw      │     │-> Errors   │     │ AI streams│     │ Persists  │
+│ components│     │ edges for │     │ on edges   │     │ feedback  │     │ to DB +   │
+│ from      │     │ data flow │     │-> Warnings │     │ + chat    │     │ Kafka     │
+│ palette   │     │           │     │ and panel  │     │ follow-up │     │ async     │
 └───────────┘     └───────────┘     └────────────┘     └───────────┘     └───────────┘
 ```
 
 ## Tech Stack
 
-| Layer          | Technology                          |
-|----------------|-------------------------------------|
-| Frontend       | React, TypeScript, Vite, React Flow |
-| API Layer      | Node.js, Express, TypeScript        |
-| Validation     | Java 17, Spring Boot                |
-| Messaging      | Apache Kafka                        |
-| AI             | Groq API (Llama 3)                  |
-| Infrastructure | Docker Compose                      |
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React, TypeScript, Vite, React Flow |
+| API Layer | Node.js, Express, TypeScript |
+| Validation | Java 17, Spring Boot |
+| Messaging | Apache Kafka |
+| Database | PostgreSQL |
+| AI | Groq API (Llama 3) |
+| Deployment | Docker Compose, Nginx |
 
 ## Features
 
 - **Drag-and-drop canvas** - 8 infrastructure components across 5 categories, serialized as a JSON graph of nodes and edges
 - **Real-time validation** - 11 architecture rules covering reliability, scalability, separation of concerns, and performance with visual indicators on affected edges
 - **AI advisor** - interactive chat powered by Groq LLM for architecture feedback with follow-up question support
+- **Design persistence** - save, update, and load designs with version tracking using PostgreSQL
+- **Design library** - browse, open, and manage all saved designs from a dashboard
 - **Async processing pipeline** - design saves trigger Kafka events, processed by Java validation engine, results delivered via SSE
 - **Data-driven rule registry** - new validation rules added through configuration without code changes
+- **Fully containerized** - all services run in Docker with health checks and orchestrated startup
 
 ## Validation Rules
 
@@ -82,11 +92,30 @@ Built for engineers who can write code but have never drawn a system diagram bef
 - Docker and Docker Compose
 - Groq API key - [console.groq.com](https://console.groq.com)
 
-### Setup
+### Run with Docker (recommended)
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/yourusername/SystemDesignBoard.git
+cd SystemDesignBoard
+
+# 2. Set up environment variables
+cp .env.example .env
+# Add your Groq API key to .env
+
+# 3. Start everything
+docker-compose up --build
+```
+
+Open [http://localhost](http://localhost)
+
+Services: Frontend (port 80), Node.js API (port 3000), Java API (port 8080)
+
+### Run locally (development)
 
 ```bash
 # 1. Start infrastructure
-docker-compose up -d
+docker-compose up -d kafka zookeeper postgres kafka-init
 
 # 2. Java backend (port 8080)
 cd backend-java
@@ -129,35 +158,40 @@ Open [http://localhost:5173](http://localhost:5173)
 
 ```
 SystemDesignBoard/
-├── frontend/                 # React + TypeScript + Vite
-│   └── src/
-│       ├── components/       # Canvas, Palette, ValidationPanel, AIAdvisor
-│       ├── config/           # API configuration
-│       ├── data/             # Component definitions
-│       └── types/            # TypeScript interfaces
+├── frontend/                  # React + TypeScript + Vite + Nginx
+│   ├── src/
+│   │   ├── components/        # Canvas, Palette, ValidationPanel, AIAdvisor,
+│   │   │                      # SaveDesign, DesignLibrary
+│   │   ├── config/            # API configuration
+│   │   ├── data/              # Component definitions
+│   │   └── types/             # TypeScript interfaces
+│   ├── Dockerfile
+│   └── nginx.conf
 │
-├── backend-node/             # Node.js + Express + TypeScript
-│   └── src/
-│       ├── config/           # Environment configuration
-│       ├── kafka/            # Producer and consumer
-│       └── routes/           # validate, analyze, design
+├── backend-node/              # Node.js + Express + TypeScript
+│   ├── src/
+│   │   ├── config/            # Environment, database, Kafka, logger
+│   │   ├── kafka/             # Producer and consumer
+│   │   ├── routes/            # validate, analyze, design
+│   │   └── services/          # Design service (business logic)
+│   └── Dockerfile
 │
-├── backend-java/             # Java 17 + Spring Boot
-│   └── src/main/java/
-│       ├── config/           # Kafka configuration
-│       ├── controller/       # REST endpoints
-│       ├── dto/              # Request/response objects
-│       ├── kafka/            # Event consumer
-│       ├── model/            # Domain models
-│       └── service/          # Validation logic
+├── backend-java/              # Java 17 + Spring Boot
+│   ├── src/main/java/
+│   │   ├── config/            # Kafka configuration
+│   │   ├── controller/        # REST endpoints
+│   │   ├── dto/               # Request/response objects
+│   │   ├── kafka/             # Event consumer
+│   │   ├── model/             # Domain models
+│   │   └── service/           # Validation logic and rule registry
+│   └── Dockerfile
 │
-└── docker-compose.yml        # Kafka, Zookeeper
+├── docker-compose.yml         # Full stack orchestration
+└── .env.example               # Environment variable template
 ```
 
 ## Upcoming
 
-- PostgreSQL - design persistence with versioning
-- Redis - validation result caching
-- Design library - browse and manage saved designs
 - Custom nodes - editable labels, category-based styling
-- AI agent - auto-generate designs from descriptions
+- AI agent - auto-generate designs from text descriptions
+- Design version history - compare changes across saves
