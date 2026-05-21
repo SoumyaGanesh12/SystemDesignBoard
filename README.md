@@ -26,9 +26,9 @@ Built for engineers who can write code but have never drawn a system diagram bef
                        └──────────────────┘
 ```
 
-**Node.js** - I/O orchestration: API routing, LLM streaming, Kafka messaging, SSE connections.
-**Java** - CPU-bound computation: graph traversal, rule-based validation.
-**Kafka** - Decouples save flow from processing. Supports future consumers without modifying the producer.
+**Node.js** - I/O orchestration: API routing, LLM streaming, Kafka messaging, SSE connections. 
+**Java** - CPU-bound computation: graph traversal, rule-based validation. 
+**Kafka** - Decouples save flow from processing. Supports future consumers without modifying the producer. 
 **PostgreSQL** - Persists designs with versioning. Stores graph data as JSONB.
 
 ## User Flow
